@@ -1,0 +1,190 @@
+; PIC16F877A Configuration Bit Settings
+; Assembly source line config statements
+#include "p16f877a.inc"
+; CONFIG
+;__config 0x3F32 
+    __CONFIG _FOSC_HS & _WDTE_OFF & _PWRTE_ON & _BOREN_OFF & _LVP_OFF & _CPD_OFF & _WRT_OFF & _CP_OFF
+ORG 0x0000
+    ;PENDIENTE: REALIZAR LOS CALCULOS PARA EL DELAY, PARA PODER OBTENER TIEMPOS OPTIMOS
+    #DEFINE RS RB0     
+    #DEFINE E RB1
+
+    CBLOCK 0x20
+         COUNT
+    ENDC
+     ;SELECCIONAMOS EL BANCO 1     
+    BSF  STATUS, RP0
+    BCF  STATUS, RP1     
+     ;COLOCAMOS LOS PUERTOS B Y D COMO SALIDAS
+    CLRF TRISD     
+    CLRF TRISB
+     ;REGRESAMOS AL BANCO 0     
+    BCF  STATUS, RP0
+    BCF  STATUS, RP1     
+    CLRF PORTD
+    CLRF PORTB     
+    GOTO LCD_CONFIG
+     
+LCD_CONFIG
+    ;CONFIGURACION INICIAL DEL CURSOR
+    CLRW     
+    MOVLW B'00001111'
+    MOVWF PORTD     
+    BSF  PORTB, E
+    NOP
+    BCF  PORTB, E     
+    CALL DELAY
+    CALL DELAY
+    CALL DELAY
+    CALL DELAY
+    CALL DELAY
+    NOP
+
+    ;LIMPIAMOS LO QUE ESTE ESCRITO EN LA PANTALLA
+    CLRW     
+    MOVLW B'00000001'
+    MOVWF PORTD     
+    BSF  PORTB, E
+    NOP
+    BCF  PORTB, E     
+    ;ES IMPORTANTE DESTACAR QUE LIMPIAR LOS REGISTROS TOMA APROX 1ms, POR ENDE, DEBEMOS
+    ;TRATAR DE DARLE TIEMPO SUFICIENTE PARA REALIZAR ESTA ACCION
+    CALL DELAY
+    CALL DELAY
+    CALL DELAY
+    CALL DELAY
+    CALL DELAY
+    NOP
+
+    CLRW     
+    MOVLW B'00000010'
+    MOVWF PORTD     
+    BSF  PORTB, E
+    NOP
+    BCF  PORTB, E     
+    CALL DELAY
+    CALL DELAY
+    CALL DELAY
+    CALL DELAY
+    CALL DELAY
+    NOP
+     
+     
+    GOTO TYPE_WORD  
+     
+TYPE_WORD     
+     ;ESCRIBIMOS LA LETRA 'B'
+    BSF  PORTB, RS     
+    CLRW
+    MOVLW B'01000010'
+    MOVWF PORTD
+    BSF  PORTB, E     
+    NOP
+    BCF  PORTB, E
+    CALL DELAY
+    NOP     
+    NOP
+
+     ;ESCRIBIMOS LA LETRA 'u'
+    BSF  PORTB, RS     
+    CLRW
+    MOVLW B'01110101'
+    MOVWF PORTD
+    BSF  PORTB, E     
+    NOP
+    BCF  PORTB, E
+    CALL DELAY
+    NOP     
+    NOP
+
+     ;ESCRIBIMOS LA LETRA 'b'
+    BSF  PORTB, RS     
+    CLRW
+    MOVLW B'01100010'
+    MOVWF PORTD
+    BSF  PORTB, E     
+    NOP
+    BCF  PORTB, E
+    CALL DELAY
+    NOP     
+    NOP
+
+     ;ESCRIBIMOS LA LETRA 'u'
+    BSF  PORTB, RS     
+    CLRW
+    MOVLW B'01110101'
+    MOVWF PORTD
+    BSF  PORTB, E     
+    NOP
+    BCF  PORTB, E
+    CALL DELAY
+    NOP     
+    NOP
+
+     ;ESCRIBIMOS LA LETRA 'x'
+    BSF  PORTB, RS     
+    CLRW
+    MOVLW B'01111000'
+    MOVWF PORTD
+    BSF  PORTB, E     
+    NOP
+    BCF  PORTB, E
+    CALL DELAY
+    NOP     
+    NOP
+
+     ;ESCRIBIMOS LA LETRA 'i'
+    BSF  PORTB, RS     
+    CLRW
+    MOVLW B'01101001'
+    MOVWF PORTD
+    BSF  PORTB, E     
+    NOP
+    BCF  PORTB, E
+    CALL DELAY
+    NOP     
+    NOP
+
+     ;ESCRIBIMOS LA LETRA 't'
+    BSF  PORTB, RS     
+    CLRW
+    MOVLW B'01110100'
+    MOVWF PORTD
+    BSF  PORTB, E     
+    NOP
+    BCF  PORTB, E
+    CALL DELAY
+    NOP     
+    NOP
+
+     ;ESCRIBIMOS LA LETRA 'a'
+    BSF  PORTB, RS     
+    CLRW
+    MOVLW B'01100001'
+    MOVWF PORTD
+    BSF  PORTB, E     
+    NOP
+    BCF  PORTB, E
+    CALL DELAY
+    CALL DELAY
+    CALL DELAY
+    CALL DELAY
+    CALL DELAY
+    NOP     
+    NOP
+    BCF  PORTB, RS     
+    GOTO LCD_CONFIG
+
+;FCY = 4MHz
+;TCY = 4MHz/4 = 1MHz
+;CY  = 1/TCY  = 100ns 
+DELAY
+    MOVLW D'200'
+    GOTO DELAY_1
+DELAY_1
+    MOVWF COUNT
+LOOP
+    DECFSZ COUNT,1
+    GOTO LOOP
+    RETURN
+END
