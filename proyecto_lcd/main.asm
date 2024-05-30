@@ -10,8 +10,10 @@ ORG 0x0000
     #DEFINE RS RB0     
     #DEFINE E RB1
 
-    CBLOCK 0x20
-         COUNT
+    CBLOCK  0x20
+    COUNT_1
+    COUNT_2
+    COUNT_3
     ENDC
      ;SELECCIONAMOS EL BANCO 1     
     BSF	    STATUS, RP0
@@ -62,111 +64,91 @@ LCD_CONFIG
 TYPE_WORD     
     BSF	    PORTB, RS         
     CLRW    
-    MOVLW   B'01000101'    
+    MOVLW   B'01000101'; E    
     CALL    E_PULSE 
 
     BSF	    PORTB, RS         
     CLRW    
-    MOVLW   B'01101100'    
+    MOVLW   B'01101100'; l   
     CALL    E_PULSE 
 
     BSF	    PORTB, RS         
     CLRW    
-    MOVLW   B'01101001'    
+    MOVLW   B'01101001'; i    
     CALL    E_PULSE 
 
     BSF	    PORTB, RS         
     CLRW    
-    MOVLW   B'01100111'    
+    MOVLW   B'01100111'; g 
     CALL    E_PULSE 
 
     BSF	    PORTB, RS     
     CLRW    
-    MOVLW   B'01100101'    
+    MOVLW   B'01100101'; e 
     CALL    E_PULSE 
 
     BSF	    PORTB, RS         
     CLRW    
-    MOVLW   B'00000000'    
+    MOVLW   B'00000010'; SPACE  
     CALL    E_PULSE 
 
     BSF	    PORTB, RS         
     CLRW    
-    MOVLW   B'01110101'    
+    MOVLW   B'01110101'; u    
     CALL    E_PULSE 
 
     BSF	    PORTB, RS         
     CLRW    
-    MOVLW   B'01101110'    
+    MOVLW   B'01101110'; n    
     CALL    E_PULSE 
 
     BSF	    PORTB, RS         
     CLRW    
-    MOVLW   B'01100001'    
+    MOVLW   B'00000010'; SPACE    
     CALL    E_PULSE 
 
     BSF	    PORTB, RS         
     CLRW    
-    MOVLW   B'00000000'    
+    MOVLW   B'01110100'; t 
     CALL    E_PULSE 
 
     BSF	    PORTB, RS         
     CLRW    
-    MOVLW   B'01100011'    
+    MOVLW   B'01101111'; o    
     CALL    E_PULSE 
 
     BSF	    PORTB, RS         
     CLRW    
-    MOVLW   B'01100001'    
-    CALL    E_PULSE 
-
-    BSF	    PORTB, RS         
-    CLRW    
-    MOVLW   B'01101110'    
+    MOVLW   B'01101110'; n    
     CALL    E_PULSE
 
     BSF	    PORTB, RS         
     CLRW    
-    MOVLW   B'01100011'    
-    CALL    E_PULSE 
-
-    BSF	    PORTB, RS         
-    CLRW    
-    MOVLW   B'01101001'    
-    CALL    E_PULSE 
-
-    BSF	    PORTB, RS         
-    CLRW    
-    MOVLW   B'01101111'    
-    CALL    E_PULSE 
-
-    BSF	    PORTB, RS         
-    CLRW    
-    MOVLW   B'01101110'    
+    MOVLW   B'01101111'; o    
     CALL    E_PULSE 
 
     BSF	    PORTB, RS
     CLRW
-    MOVLW   B'00000000'
+    MOVLW   B'00000010'; SPACE
     CALL    E_PULSE
     
     BSF	    PORTB, RS
     CLRW
-    MOVLW   B'00111010'
+    MOVLW   B'00111010'; :
     CALL    E_PULSE
     
     BSF	    PORTB, RS
     CLRW
-    MOVLW   B'01000100'
+    MOVLW   B'01000100'; D
     CALL    E_PULSE
     
     ;SILENCING THE BUZZER
-    BCF     STATUS, RP0
-    BCF     STATUS, RP1
-    MOVLW   D'0'
-    MOVWF   PR2
-    MOVLW   D'0'
-    MOVWF   CCPR1L
+    ;BCF     STATUS, RP0
+    ;BCF     STATUS, RP1
+    ;MOVLW   D'0'
+    ;MOVWF   PR2
+    ;MOVLW   D'0'
+    ;MOVWF   CCPR1L
     GOTO    SELECT_SONG
 
 ;FCY = 4MHz
@@ -174,15 +156,24 @@ TYPE_WORD
 ;CY  = 1/TCY  = 100ns 
 ;DELAY CODE
 DELAY; 1C  + 2C + 1C + 1C + 200C + 2C
-    MOVLW   D'200'
-    GOTO    DELAY_1
-DELAY_1
-    MOVWF   COUNT
-LOOP
-    DECFSZ  COUNT,1
-    GOTO    LOOP
+    ;MOVLW	0x08
+    MOVLW	D'256'
+    MOVWF	COUNT_1
+    MOVLW	D'10'
+    MOVWF	COUNT_2
+    MOVLW	D'1'
+    MOVWF	COUNT_3
+    CALL LOOP
     RETURN
-    
+LOOP
+    DECFSZ  COUNT_1,1
+    GOTO    $ + 2
+    DECFSZ  COUNT_2,1
+    GOTO    $ + 2
+    DECFSZ  COUNT_3,1
+    GOTO    $ + 2
+    RETURN
+    GOTO LOOP    
 ;CODE TO PRINT A LETTER IN LCD
 SELECT_SONG
     BTFSC   PORTC, RC0
@@ -245,10 +236,8 @@ E_PULSE
     NOP
     BCF	    PORTB, E     
     CALL    DELAY
-    CALL    DELAY
-    CALL    DELAY
-    CALL    DELAY
-    CALL    DELAY
+    CLRW
+    CLRF    PORTD
     NOP
     RETURN
 END
